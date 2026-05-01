@@ -1,6 +1,6 @@
 import { server } from "@/test/server";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http } from "msw";
 import { MemoryRouter } from "react-router-dom";
@@ -49,8 +49,10 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText(/用户名/i), "alice");
     await user.type(screen.getByLabelText(/密码/i), "secret");
     await user.click(screen.getByRole("button", { name: /登录/i }));
-    // MSW returns 200; no error alert should appear
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    // Wait for the mutation to settle; no error alert should appear after success
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
   });
 
   it("shows error message on API failure", async () => {

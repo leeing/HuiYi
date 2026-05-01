@@ -20,6 +20,7 @@ const schema = z
       .string()
       .max(200, "简介最多200字")
       .optional()
+      .transform((val) => (val === "" || val === undefined ? undefined : val))
       .describe("个人简介"),
   })
   .refine((data) => data.password === data.confirmPassword, {

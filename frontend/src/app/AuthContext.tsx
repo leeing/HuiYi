@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { z } from "zod";
 
 type AuthState =
   | { status: "loading" }
@@ -32,12 +33,14 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const STORAGE_KEY = "huiyi_auth";
 
-interface StoredAuth {
-  userId: number;
-  username: string;
-  avatar: string;
-  signature: string;
-}
+const StoredAuthSchema = z.object({
+  userId: z.number().describe("Numeric user ID from the backend"),
+  username: z.string().describe("Display name of the authenticated user"),
+  avatar: z.string().describe("URL or path to the user's avatar image"),
+  signature: z.string().describe("User's personal signature or bio"),
+});
+
+type StoredAuth = z.infer<typeof StoredAuthSchema>;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({ status: "loading" });
@@ -46,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        const parsed = JSON.parse(stored) as StoredAuth;
+        const parsed = StoredAuthSchema.parse(JSON.parse(stored));
         setState({
           status: "authenticated",
           userId: parsed.userId,

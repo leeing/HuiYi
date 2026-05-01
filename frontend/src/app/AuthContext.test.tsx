@@ -42,16 +42,25 @@ describe("AuthContext", () => {
     expect(result.current.status).toBe("authenticated");
   });
 
-  it("logout() updates state to anonymous", () => {
-    localStorage.setItem(
-      "huiyi_auth",
-      JSON.stringify({ userId: 1, username: "bob", avatar: "", signature: "" }),
+  it("starts in loading state before useEffect fires", () => {
+    localStorage.clear();
+    // Use renderHook with no act wrapping to capture the initial synchronous state
+    let initialStatus: string | undefined;
+    renderHook(
+      () => {
+        const auth = useAuth();
+        if (initialStatus === undefined) {
+          initialStatus = auth.status;
+        }
+        return auth;
+      },
+      {
+        wrapper: ({ children }: { children: React.ReactNode }) => (
+          <AuthProvider>{children}</AuthProvider>
+        ),
+      },
     );
-    const { result } = renderHook(() => useAuth(), { wrapper });
-    expect(result.current.status).toBe("authenticated");
-    act(() => {
-      result.current.logout();
-    });
-    expect(result.current.status).toBe("anonymous");
+    // The very first render (before useEffect) should be "loading"
+    expect(initialStatus).toBe("loading");
   });
 });

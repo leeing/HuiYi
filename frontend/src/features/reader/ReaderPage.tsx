@@ -1,8 +1,7 @@
 import { useBookContent, useUpdateCurrentBook } from "@/api/hooks/useReader";
 import { AuthContext } from "@/app/AuthContext";
-import { paginate } from "@/lib/paginate";
 import type { ReaderTheme } from "@/lib/readerPrefs";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AiOverlay from "./AiOverlay";
 import ReaderContent from "./ReaderContent";
@@ -25,22 +24,6 @@ interface SelectionState {
   y: number;
 }
 
-/** Returns true only on desktop (≥1024 px) and only after mount.
- *  In jsdom (no matchMedia) this always returns false, keeping TocSidebar
- *  out of the DOM so test queries don't see duplicate chapter headings. */
-function useIsDesktop(): boolean {
-  const [isDesktop, setIsDesktop] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return isDesktop;
-}
-
 export default function ReaderPage() {
   const { bookId } = useParams<{ bookId: string }>();
   const bookIdNum = Number(bookId ?? "0");
@@ -56,19 +39,13 @@ export default function ReaderPage() {
   const [aiText, setAiText] = useState<string | null>(null);
   const [showPrefs, setShowPrefs] = useState(false);
   const { prefs, setPrefs } = useReaderPrefs();
-  const isDesktop = useIsDesktop();
-
   const content = data?.content ?? "";
-  // Precompute page count (used by TocSidebar internally; kept here for context)
-  const _totalPages = useMemo(
-    () => paginate(content, CHARS_PER_PAGE).length,
-    [content],
-  );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: currentPage is intentional trigger dep — re-sync current book on every page turn
   useEffect(() => {
     if (!bookIdNum || !userId || !content) return;
     updateCurrentBook({ user_id: userId, book_id: bookIdNum });
-  }, [bookIdNum, userId, content, updateCurrentBook]);
+  }, [currentPage, bookIdNum, userId, content, updateCurrentBook]);
 
   const handleSelectionChange = useCallback(
     (text: string, x: number, y: number) => {
@@ -133,21 +110,14 @@ export default function ReaderPage() {
       )}
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Navigation landmark — always present for accessibility. */}
-        <nav aria-label="目录" className="sr-only" />
-
-        {/* Visual TOC sidebar — rendered only on desktop to avoid duplicate
-            chapter headings in the DOM that would confuse DOM text queries. */}
-        {isDesktop && (
-          <aside className="w-56 shrink-0">
-            <TocSidebar
-              content={content}
-              currentPage={currentPage}
-              onNavigate={setCurrentPage}
-              charsPerPage={CHARS_PER_PAGE}
-            />
-          </aside>
-        )}
+        <aside className="w-56 shrink-0 border-r border-ink-dark/10">
+          <TocSidebar
+            content={content}
+            currentPage={currentPage}
+            onNavigate={setCurrentPage}
+            charsPerPage={CHARS_PER_PAGE}
+          />
+        </aside>
 
         <main className="flex-1 overflow-hidden">
           <ReaderContent

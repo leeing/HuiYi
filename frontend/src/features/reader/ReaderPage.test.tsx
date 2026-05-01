@@ -35,7 +35,8 @@ describe("ReaderPage", () => {
 
   it("renders the first page of content", async () => {
     render(<ReaderPage />, { wrapper: makeWrapper() });
-    expect(await screen.findByText(/第一章/)).toBeInTheDocument();
+    const matches = await screen.findAllByText(/第一章/);
+    expect(matches.length).toBeGreaterThan(0);
   });
 
   it("renders the TOC sidebar", async () => {

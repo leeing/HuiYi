@@ -27,4 +27,15 @@ export const handlers = [
     Response.json({ username: "test", avatar: "", signature: "" }),
   ),
   http.get("/api/current_book", () => Response.json({ book_id: null })),
+  http.get("/api/book_content", () =>
+    Response.json({
+      title: "测试书籍",
+      author: "测试作者",
+      content:
+        "第一章 开始\n\n这是第一章的内容，用于测试阅读器分页功能。\n\n第二章 中间\n\n这是第二章的内容，继续测试。",
+    }),
+  ),
+  http.post("/api/chat", () =>
+    Response.json({ response: "这是一个测试 AI 回复。" }),
+  ),
 ];

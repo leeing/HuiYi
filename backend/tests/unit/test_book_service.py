@@ -12,7 +12,9 @@ from app.services.book_service import get_book_content, get_books, upload_book
 
 @pytest.fixture(name="session")
 def session_fixture():
-    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+    engine = create_engine(
+        "sqlite:///:memory:", connect_args={"check_same_thread": False}
+    )
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         yield session
@@ -20,7 +22,9 @@ def session_fixture():
 
 @pytest.fixture(name="user_id")
 def user_id_fixture(session: Session) -> str:
-    resp = register_user(RegisterRequest(username="reader", password="testpass"), session)
+    resp = register_user(
+        RegisterRequest(username="reader", password="testpass"), session
+    )
     return resp.user_id
 
 

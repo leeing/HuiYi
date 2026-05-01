@@ -3,7 +3,7 @@ services:
     name: huiyi
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python run_app.py
+    startCommand: cd backend && pip install uv && uv sync && uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DASHSCOPE_API_KEY
         sync: false

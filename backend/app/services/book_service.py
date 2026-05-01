@@ -3,21 +3,29 @@ import logging
 import uuid
 from pathlib import Path
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from app.core.config import settings
 from app.models.models import Book
-from app.schemas.books import BookContentResponse, BookListResponse, BookOut, UploadRequest
+from app.schemas.books import (
+    BookContentResponse,
+    BookListResponse,
+    BookOut,
+    UploadRequest,
+)
 
 logger = logging.getLogger("huiyi.books")
 
 
 def get_books(user_id: str, session: Session) -> BookListResponse:
     books = session.exec(
-        select(Book).where(Book.user_id == user_id).order_by(Book.added_at.desc())
+        select(Book).where(Book.user_id == user_id).order_by(col(Book.added_at).desc())
     ).all()
     return BookListResponse(
-        books=[BookOut(id=b.id, title=b.title, author=b.author, progress=b.progress) for b in books]
+        books=[
+            BookOut(id=b.id, title=b.title, author=b.author, progress=b.progress)
+            for b in books
+        ]
     )
 
 
@@ -59,7 +67,12 @@ def upload_book(
     file_path.write_bytes(file_bytes)
 
     title = Path(req.filename).stem
-    book = Book(user_id=req.user_id, title=title, author=req.author, filepath=safe_filename)
+    book = Book(
+        user_id=req.user_id,
+        title=title,
+        author=req.author,
+        filepath=safe_filename,
+    )
     session.add(book)
     session.commit()
     session.refresh(book)

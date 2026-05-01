@@ -4,8 +4,10 @@ _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(plain: str) -> str:
-    return _pwd_context.hash(plain)
+    result: str = _pwd_context.hash(plain)
+    return result
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return _pwd_context.verify(plain, hashed)
+    result: bool = _pwd_context.verify(plain, hashed)
+    return result

@@ -1,9 +1,13 @@
 import logging
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from app.models.models import Book, User
-from app.schemas.users import CurrentBookResponse, UpdateCurrentBookRequest, UserProfileResponse
+from app.schemas.users import (
+    CurrentBookResponse,
+    UpdateCurrentBookRequest,
+    UserProfileResponse,
+)
 
 logger = logging.getLogger("huiyi.users")
 
@@ -27,10 +31,12 @@ def get_current_book(user_id: str, session: Session) -> CurrentBookResponse:
     book_id = user.current_book_id
     if not book_id:
         book = session.exec(
-            select(Book).where(Book.user_id == user_id).order_by(Book.added_at.desc())
+            select(Book).where(Book.user_id == user_id).order_by(col(Book.added_at).desc())
         ).first()
         if book:
-            return CurrentBookResponse(book_id=book.id, title=book.title, author=book.author)
+            return CurrentBookResponse(
+                book_id=book.id, title=book.title, author=book.author
+            )
         return CurrentBookResponse(book_id=None)
 
     book = session.get(Book, book_id)
@@ -39,7 +45,9 @@ def get_current_book(user_id: str, session: Session) -> CurrentBookResponse:
     return CurrentBookResponse(book_id=book.id, title=book.title, author=book.author)
 
 
-def update_current_book(req: UpdateCurrentBookRequest, session: Session) -> dict[str, bool]:
+def update_current_book(
+    req: UpdateCurrentBookRequest, session: Session
+) -> dict[str, bool]:
     user = session.get(User, req.user_id)
     if not user:
         raise LookupError(f"User not found: {req.user_id}")

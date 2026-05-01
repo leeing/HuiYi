@@ -2,7 +2,9 @@ from fastapi.testclient import TestClient
 
 
 def test_register_success(client: TestClient) -> None:
-    resp = client.post("/api/register", json={"username": "alice", "password": "testpass"})
+    resp = client.post(
+        "/api/register", json={"username": "alice", "password": "testpass"}
+    )
     assert resp.status_code == 200
     data = resp.json()
     assert "user_id" in data
@@ -11,7 +13,9 @@ def test_register_success(client: TestClient) -> None:
 
 def test_register_duplicate_username(client: TestClient) -> None:
     client.post("/api/register", json={"username": "bob", "password": "testpass"})
-    resp = client.post("/api/register", json={"username": "bob", "password": "testpass2"})
+    resp = client.post(
+        "/api/register", json={"username": "bob", "password": "testpass2"}
+    )
     assert resp.status_code == 400
     assert "Username taken" in resp.json()["detail"]
 

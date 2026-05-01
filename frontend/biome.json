@@ -17,6 +17,14 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "src/api/generated"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "src/api/generated",
+      "vite.config.js",
+      "vite.config.d.ts",
+      "tsconfig.tsbuildinfo",
+      "tsconfig.node.tsbuildinfo"
+    ]
   }
 }

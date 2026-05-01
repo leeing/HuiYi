@@ -1,34 +1,30 @@
-import * as msw from "msw";
+import { http } from "msw";
 
 export const handlers = [
-  msw.http.post("/api/login", () =>
-    msw.HttpResponse.json({
+  http.post("/api/login", () =>
+    Response.json({
       message: "ok",
       user_id: 1,
       avatar: "",
       signature: "",
     }),
   ),
-  msw.http.post("/api/register", () =>
-    msw.HttpResponse.json({
+  http.post("/api/register", () =>
+    Response.json({
       message: "ok",
       user_id: 1,
       avatar: "",
       signature: "",
     }),
   ),
-  msw.http.get("/api/books", () =>
-    msw.HttpResponse.json({
+  http.get("/api/books", () =>
+    Response.json({
       books: [{ id: 1, title: "测试书籍", author: "测试作者", progress: 0 }],
     }),
   ),
-  msw.http.post("/api/upload", () =>
-    msw.HttpResponse.json({ message: "ok", book_id: 1 }),
+  http.post("/api/upload", () => Response.json({ message: "ok", book_id: 1 })),
+  http.get("/api/user_profile", () =>
+    Response.json({ username: "test", avatar: "", signature: "" }),
   ),
-  msw.http.get("/api/user_profile", () =>
-    msw.HttpResponse.json({ username: "test", avatar: "", signature: "" }),
-  ),
-  msw.http.get("/api/current_book", () =>
-    msw.HttpResponse.json({ book_id: null }),
-  ),
+  http.get("/api/current_book", () => Response.json({ book_id: null })),
 ];

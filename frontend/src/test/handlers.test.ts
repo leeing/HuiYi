@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { handlers } from "./handlers";
 
 describe("MSW handlers", () => {
-  it("exports a non-empty array of handlers", () => {
+  it("exports an array with all 6 endpoint handlers", () => {
     expect(Array.isArray(handlers)).toBe(true);
-    expect(handlers.length).toBeGreaterThan(0);
+    expect(handlers).toHaveLength(6);
   });
 });

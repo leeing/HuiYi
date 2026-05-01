@@ -3,7 +3,7 @@ import { AuthContext } from "@/app/AuthContext";
 import { paginate } from "@/lib/paginate";
 import type { ReaderTheme } from "@/lib/readerPrefs";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import AiOverlay from "./AiOverlay";
 import ReaderContent from "./ReaderContent";
 import ReaderPrefsPanel from "./ReaderPrefsPanel";
@@ -27,7 +27,8 @@ interface SelectionState {
 
 export default function ReaderPage() {
   const { bookId } = useParams<{ bookId: string }>();
-  const bookIdNum = Number(bookId ?? "0");
+  const rawId = Number(bookId ?? "0");
+  const bookIdNum = Number.isNaN(rawId) ? 0 : rawId;
 
   const authCtx = useContext(AuthContext);
   const userId = authCtx?.status === "authenticated" ? authCtx.userId : 0;
@@ -87,13 +88,13 @@ export default function ReaderPage() {
     <div className={`flex h-screen flex-col ${themeBg}`}>
       <header className="flex items-center justify-between border-b border-ink-dark/10 bg-white px-6 py-3">
         <div className="flex items-center gap-3">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="text-sm text-ink-dark/50 hover:text-ink-dark"
             aria-label="返回书架"
           >
             ← 书架
-          </a>
+          </Link>
           <span className="text-ink-dark/20">|</span>
           <h1 className="text-sm font-medium text-ink-dark">{data.title}</h1>
         </div>

@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-xuan-paper: #F9F5F0;
+  --color-ink-dark: #2C2C2C;
+  --color-warm-red: #A64D4D;
+}
+
+body {
+  background-color: theme("colors.xuan-paper");
+  color: theme("colors.ink-dark");
+}

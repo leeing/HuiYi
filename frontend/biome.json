@@ -24,7 +24,9 @@
       "vite.config.js",
       "vite.config.d.ts",
       "tsconfig.tsbuildinfo",
-      "tsconfig.node.tsbuildinfo"
+      "tsconfig.node.tsbuildinfo",
+      "tailwind.config.ts",
+      "src/styles/index.css"
     ]
   }
 }

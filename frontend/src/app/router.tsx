@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 const LoginPage = lazy(() => import("@/features/auth/LoginPage"));
 const RegisterPage = lazy(() => import("@/features/auth/RegisterPage"));
 const BookshelfPage = lazy(() => import("@/features/bookshelf/BookshelfPage"));
+const ReaderPage = lazy(() => import("@/features/reader/ReaderPage"));
 
 function PageFallback() {
   return (
@@ -39,6 +40,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageFallback />}>
             <BookshelfPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/reader/:bookId",
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <ReaderPage />
           </Suspense>
         ),
       },

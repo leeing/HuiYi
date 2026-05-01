@@ -29,7 +29,7 @@ type AuthContextValue = AuthState & {
   logout: () => void;
 };
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 const STORAGE_KEY = "huiyi_auth";
 

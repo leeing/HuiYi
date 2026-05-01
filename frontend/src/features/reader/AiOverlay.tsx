@@ -18,7 +18,7 @@ export default function AiOverlay({
   useEffect(() => {
     mutate({
       message: `请解释这段文字的含义：${selectedText}`,
-      book_context: bookContext || undefined,
+      book_context: bookContext,
     });
   }, []);
 

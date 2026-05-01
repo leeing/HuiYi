@@ -17,10 +17,10 @@ const ReaderPrefsSchema = z.object({
 
 export type ReaderPrefs = z.infer<typeof ReaderPrefsSchema>;
 
-export const DEFAULT_PREFS: ReaderPrefs = {
+export const DEFAULT_PREFS = {
   fontSize: 18,
   theme: "light",
-};
+} as const satisfies ReaderPrefs;
 
 const STORAGE_KEY = "huiyi_reader_prefs";
 

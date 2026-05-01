@@ -63,6 +63,10 @@ export interface UpdateCurrentBookRequest {
   book_id: number;
 }
 
+export interface UpdateCurrentBookResponse {
+  success: true;
+}
+
 export interface ChatRequest {
   message: string;
   user_id?: number;

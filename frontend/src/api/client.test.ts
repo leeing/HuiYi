@@ -56,4 +56,63 @@ describe("apiClient", () => {
       ApiError,
     );
   });
+
+  it("throws ApiError with correct status and detail fields", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: "Forbidden" }),
+      }),
+    );
+    try {
+      await apiClient("/test", { method: "GET" });
+      expect.fail("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(ApiError);
+      if (err instanceof ApiError) {
+        expect(err.status).toBe(403);
+        expect(err.detail).toBe("Forbidden");
+        expect(err.name).toBe("ApiError");
+      }
+    }
+  });
+
+  it("falls back to HTTP status when error response body is not JSON", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        json: async () => {
+          throw new Error("not json");
+        },
+      }),
+    );
+    try {
+      await apiClient("/test", { method: "GET" });
+      expect.fail("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(ApiError);
+      if (err instanceof ApiError) {
+        expect(err.detail).toBe("HTTP 500");
+      }
+    }
+  });
+
+  it("allows caller to override Content-Type header", async () => {
+    await apiClient("/upload", {
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    expect(vi.mocked(fetch)).toHaveBeenCalledWith(
+      "/api/upload",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "multipart/form-data",
+        }),
+      }),
+    );
+  });
 });

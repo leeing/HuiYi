@@ -5,6 +5,7 @@ export class ApiError extends Error {
   ) {
     super(`API error ${status}: ${detail}`);
     this.name = "ApiError";
+    Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
 
@@ -12,11 +13,18 @@ export async function apiClient<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
+  const callerHeaders: Record<string, string> =
+    init.headers instanceof Headers
+      ? Object.fromEntries(init.headers.entries())
+      : Array.isArray(init.headers)
+        ? Object.fromEntries(init.headers)
+        : (init.headers ?? {});
+
   const response = await fetch(`/api${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      ...init.headers,
+      ...callerHeaders,
     },
   });
 
@@ -26,10 +34,11 @@ export async function apiClient<T>(
       const body = (await response.json()) as { detail?: string };
       if (body.detail) detail = body.detail;
     } catch {
-      // ignore parse errors — use status text
+      // ignore parse errors — use status code as fallback
     }
     throw new ApiError(response.status, detail);
   }
 
+  // NOTE: response.json() returns unknown at runtime; caller is trusted to provide correct T
   return response.json() as Promise<T>;
 }

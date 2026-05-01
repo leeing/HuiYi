@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlmodel import Field, SQLModel
 
@@ -17,7 +16,7 @@ class User(SQLModel, table=True):
     password_hash: str
     avatar: str = Field(default="default_avatar_1.svg")
     signature: str = Field(default="懂书也懂你")
-    current_book_id: Optional[str] = Field(default=None)
+    current_book_id: str | None = Field(default=None)
 
 
 class Book(SQLModel, table=True):

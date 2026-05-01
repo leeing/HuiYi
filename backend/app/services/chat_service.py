@@ -61,7 +61,9 @@ async def get_chat_response(
     books: list[tuple[str, str]] = []
     if user_id:
         db_books = session.exec(
-            select(Book).where(Book.user_id == user_id).order_by(col(Book.added_at).desc())
+            select(Book)
+            .where(Book.user_id == user_id)
+            .order_by(col(Book.added_at).desc())
         ).all()
         books = [(b.title, b.author) for b in db_books]
 

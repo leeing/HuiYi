@@ -31,7 +31,9 @@ def get_current_book(user_id: str, session: Session) -> CurrentBookResponse:
     book_id = user.current_book_id
     if not book_id:
         book = session.exec(
-            select(Book).where(Book.user_id == user_id).order_by(col(Book.added_at).desc())
+            select(Book)
+            .where(Book.user_id == user_id)
+            .order_by(col(Book.added_at).desc())
         ).first()
         if book:
             return CurrentBookResponse(

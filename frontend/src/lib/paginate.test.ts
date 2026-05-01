@@ -36,4 +36,13 @@ describe("paginate", () => {
     expect(pages).toHaveLength(1);
     expect(pages[0]).toHaveLength(100);
   });
+
+  it("falls back to hard cut when no whitespace in range", () => {
+    // "abcdefghij" with limit 4: no spaces, so must hard-cut every 4 chars
+    const pages = paginate("abcdefghij", 4);
+    expect(pages).toHaveLength(3);
+    expect(pages[0]).toBe("abcd");
+    expect(pages[1]).toBe("efgh");
+    expect(pages[2]).toBe("ij");
+  });
 });

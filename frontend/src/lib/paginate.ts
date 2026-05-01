@@ -21,7 +21,7 @@ export function paginate(content: string, charsPerPage: number): string[] {
     const lastSpace = slice.lastIndexOf(" ");
 
     let boundary: number;
-    if (lastSpace > 0) {
+    if (lastSpace !== -1) {
       boundary = lastSpace; // cut before the space
     } else {
       boundary = charsPerPage; // no whitespace found — hard cut

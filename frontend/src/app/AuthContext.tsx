@@ -57,7 +57,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           avatar: parsed.avatar,
           signature: parsed.signature,
         });
-      } catch {
+      } catch (err) {
+        if (!(err instanceof SyntaxError) && !(err instanceof z.ZodError))
+          throw err;
         localStorage.removeItem(STORAGE_KEY);
         setState({ status: "anonymous" });
       }

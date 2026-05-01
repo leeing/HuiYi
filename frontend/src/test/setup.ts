@@ -33,5 +33,8 @@ if (
 }
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  localStorage.clear();
+});
 afterAll(() => server.close());

@@ -1,5 +1,11 @@
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 type AuthState =
   | { status: "loading" }
@@ -57,21 +63,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  function login(
-    userId: number,
-    username: string,
-    avatar: string,
-    signature: string,
-  ) {
-    const stored: StoredAuth = { userId, username, avatar, signature };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
-    setState({ status: "authenticated", userId, username, avatar, signature });
-  }
+  const login = useCallback(
+    (userId: number, username: string, avatar: string, signature: string) => {
+      const stored: StoredAuth = { userId, username, avatar, signature };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+      setState({
+        status: "authenticated",
+        userId,
+        username,
+        avatar,
+        signature,
+      });
+    },
+    [],
+  );
 
-  function logout() {
+  const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setState({ status: "anonymous" });
-  }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ ...state, login, logout }}>

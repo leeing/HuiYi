@@ -1,8 +1,10 @@
 import logging
 
 import httpx
+from sqlmodel import Session, select
 
 from app.core.config import settings
+from app.models.models import Book
 
 logger = logging.getLogger("huiyi.chat")
 
@@ -48,6 +50,23 @@ def build_system_prompt(
         prompt += "结合用户提到的书本内容进行回应。"
 
     return prompt
+
+
+async def get_chat_response(
+    message: str,
+    user_id: str | None,
+    book_context: str,
+    session: Session,
+) -> str:
+    books: list[tuple[str, str]] = []
+    if user_id:
+        db_books = session.exec(
+            select(Book).where(Book.user_id == user_id).order_by(Book.added_at.desc())
+        ).all()
+        books = [(b.title, b.author) for b in db_books]
+
+    system_prompt = build_system_prompt(books=books, book_context=book_context)
+    return await call_dashscope(message, system_prompt)
 
 
 async def call_dashscope(message: str, system_prompt: str) -> str:

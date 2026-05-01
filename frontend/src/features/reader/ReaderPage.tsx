@@ -1,5 +1,6 @@
 import { useBookContent, useUpdateCurrentBook } from "@/api/hooks/useReader";
 import { AuthContext } from "@/app/AuthContext";
+import { paginate } from "@/lib/paginate";
 import type { ReaderTheme } from "@/lib/readerPrefs";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -41,10 +42,14 @@ export default function ReaderPage() {
   const { prefs, setPrefs } = useReaderPrefs();
   const content = data?.content ?? "";
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: currentPage is intentional trigger dep — re-sync current book on every page turn
   useEffect(() => {
     if (!bookIdNum || !userId || !content) return;
+    const totalPages = paginate(content, CHARS_PER_PAGE).length;
+    const progress =
+      totalPages > 1 ? Math.round((currentPage / (totalPages - 1)) * 100) : 100;
     updateCurrentBook({ user_id: userId, book_id: bookIdNum });
+    // progress is computed but API doesn't accept it yet
+    void progress;
   }, [currentPage, bookIdNum, userId, content, updateCurrentBook]);
 
   const handleSelectionChange = useCallback(

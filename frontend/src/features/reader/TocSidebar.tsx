@@ -95,7 +95,7 @@ export default function TocSidebar({
       ) : (
         <ul className="flex flex-col py-2">
           {toc.map((entry, i) => (
-            <li key={entry.pageIndex}>
+            <li key={entry.title}>
               <button
                 type="button"
                 aria-current={i === activeIndex ? "true" : undefined}

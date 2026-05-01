@@ -14,6 +14,7 @@ export default function SelectionMenu({
   selectedText,
   position,
   onAiAssist,
+  onClose,
 }: SelectionMenuProps) {
   if (!selectedText) return null;
 
@@ -33,6 +34,17 @@ export default function SelectionMenu({
           className="rounded px-3 py-1 text-sm text-ink-dark hover:bg-warm-red hover:text-white"
         >
           ✨ AI 解读
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          role="menuitem"
+          aria-label="关闭菜单"
+          onClick={onClose}
+          className="rounded px-2 py-1 text-sm text-ink-dark/50 hover:bg-ink-dark/5"
+        >
+          ×
         </button>
       </li>
     </menu>

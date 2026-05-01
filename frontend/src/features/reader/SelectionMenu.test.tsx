@@ -31,6 +31,20 @@ describe("SelectionMenu", () => {
     ).toBeInTheDocument();
   });
 
+  it("calls onClose when close button is clicked", async () => {
+    const onClose = vi.fn();
+    render(
+      <SelectionMenu
+        selectedText="一些文字"
+        position={{ x: 0, y: 0 }}
+        onAiAssist={vi.fn()}
+        onClose={onClose}
+      />,
+    );
+    await userEvent.click(screen.getByRole("menuitem", { name: /关闭菜单/ }));
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it("calls onAiAssist with selectedText when AI button is clicked", async () => {
     const onAiAssist = vi.fn();
     render(

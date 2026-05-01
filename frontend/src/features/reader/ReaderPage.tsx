@@ -43,6 +43,9 @@ export default function ReaderPage() {
   const { prefs, setPrefs } = useReaderPrefs();
   const content = data?.content ?? "";
 
+  // Fires on every page turn to keep the backend aware of the current book being read.
+  // The payload is intentionally minimal (user_id + book_id); progress percentage is
+  // computed locally but the API does not yet accept it.
   useEffect(() => {
     if (!bookIdNum || !userId || !content) return;
     const totalPages = paginate(content, CHARS_PER_PAGE).length;

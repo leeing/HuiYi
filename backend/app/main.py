@@ -2,9 +2,9 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import Session
 
@@ -14,17 +14,15 @@ from app.core.logging import setup_logging
 from app.db.session import create_db_and_tables, engine
 from app.services.auth_service import seed_default_data
 
-# Project root (one level above backend/)
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+# Directories (resolved relative to this file's location)
+_BACKEND_DIR = Path(__file__).parent.parent  # backend/
+PROJECT_ROOT = _BACKEND_DIR.parent  # project root
 
-PAGE_MAP: dict[str, str] = {
-    "login": "login.html",
-    "bookshelf": "bookshelf.html",
-    "reader": "reader.html",
-    "chat": "chat.html",
-    "notes": "notes.html",
-    "profile": "profile.html",
-}
+# React SPA build output
+FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
+
+# Legacy static files (avatars, uploaded books)
+_STATIC_DIR = PROJECT_ROOT / "static"
 
 
 @asynccontextmanager
@@ -52,29 +50,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API routes
+# API routes (must be registered BEFORE static mounts and SPA fallback)
 app.include_router(auth.router, prefix="/api")
 app.include_router(books.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 
-# Static files (avatars, books, tailwind.js)
-_static_dir = PROJECT_ROOT / "static"
-if _static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
+# Legacy static files (avatars, uploaded book txt files)
+if _STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+
+# React SPA assets (JS/CSS chunks from Vite build)
+_assets_dir = FRONTEND_DIST / "assets"
+if _assets_dir.exists():
+    app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
 
 
-@app.get("/")
-def root() -> RedirectResponse:
-    return RedirectResponse(url="/login")
-
-
-@app.get("/{page}", response_model=None)
-def serve_page(page: str) -> FileResponse | RedirectResponse:
-    filename = PAGE_MAP.get(page)
-    if not filename:
-        return RedirectResponse(url="/login")
-    path = PROJECT_ROOT / filename
-    if path.exists():
-        return FileResponse(str(path))
-    return RedirectResponse(url="/login")
+# SPA fallback — must be LAST
+@app.get("/{full_path:path}", response_class=HTMLResponse)
+def spa_fallback(full_path: str) -> FileResponse:
+    """Return index.html for all non-API paths (React Router handles routing)."""
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="Not found")
+    index = FRONTEND_DIST / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
+    # Graceful degradation when frontend is not built yet
+    return FileResponse(str(PROJECT_ROOT / "index.html"))

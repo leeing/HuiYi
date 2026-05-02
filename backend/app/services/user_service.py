@@ -18,8 +18,8 @@ def get_user_profile(user_id: str, session: Session) -> UserProfileResponse:
         raise LookupError(f"User not found: {user_id}")
     return UserProfileResponse(
         username=user.username,
-        avatar=user.avatar or "default_avatar_1.svg",
-        signature=user.signature or "懂书也懂你",
+        avatar=user.avatar,
+        signature=user.signature,
     )
 
 

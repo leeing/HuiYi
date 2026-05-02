@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlmodel import Field, SQLModel
 
@@ -28,4 +28,4 @@ class Book(SQLModel, table=True):
     author: str = Field(default="Unknown")
     filepath: str
     progress: int = Field(default=0)
-    added_at: datetime = Field(default_factory=datetime.utcnow)
+    added_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

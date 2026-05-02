@@ -11,7 +11,7 @@ from sqlmodel import Session
 from app.api.routes import auth, books, chat, users
 from app.core.config import settings
 from app.core.logging import setup_logging
-from app.db.session import create_db_and_tables, engine
+from app.db.session import create_db_and_tables, get_engine
 from app.services.auth_service import seed_default_data
 
 # Directories (resolved relative to this file's location)
@@ -29,7 +29,7 @@ _STATIC_DIR = PROJECT_ROOT / "static"
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     setup_logging()
     create_db_and_tables()
-    with Session(engine) as session:
+    with Session(get_engine()) as session:
         seed_default_data(session)
     yield
 
@@ -40,7 +40,7 @@ app = FastAPI(title="会意 Huiyi API", lifespan=lifespan)
 _origins = (
     ["*"]
     if settings.ENVIRONMENT == "development"
-    else []  # Add production domains here
+    else settings.CORS_ORIGINS  # Configure via CORS_ORIGINS env var in production
 )
 app.add_middleware(
     CORSMiddleware,

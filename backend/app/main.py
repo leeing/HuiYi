@@ -75,5 +75,8 @@ def spa_fallback(full_path: str) -> FileResponse:
     index = FRONTEND_DIST / "index.html"
     if index.exists():
         return FileResponse(str(index))
-    # Graceful degradation when frontend is not built yet
-    return FileResponse(str(PROJECT_ROOT / "index.html"))
+    # Graceful degradation when frontend is not built
+    raise HTTPException(
+        status_code=503,
+        detail="Frontend not built — run: cd frontend && pnpm build",
+    )

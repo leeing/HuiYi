@@ -2,128 +2,155 @@
 
 > **懂书也懂你的 AI 阅读伴侣**
 
-会意是一款融合沉浸式阅读与 AI 深度互动的智能阅读社区平台。东方美学设计风格，以宣纸质感为底色，让每一次阅读都有温度。
+会意是一款融合沉浸式阅读与 AI 深度互动的智能阅读应用。东方美学设计风格，以宣纸质感为底色，让每一次阅读都有温度。
 
 ---
 
-## ✨ 功能亮点
+## ✨ 当前功能
 
-### 📚 智能书架
-- 支持 TXT 书籍本地导入，内置《红楼梦》《生育制度》《长安的荔枝》《基层女性》等经典书目
-- 根据书名哈希自动生成独特渐变色封面，无需封面图
-- 实时显示阅读进度（百分比）与阅读状态（未开始 / 阅读中 / 已读完）
+### 📚 书架
+- 支持上传 TXT 格式书籍，内置《红楼梦》《生育制度》《长安的荔枝》《基层女性》等经典书目
+- 根据书名哈希自动生成独特渐变色封面
+- 实时记录阅读进度（百分比）
 
 ### 📖 沉浸式阅读器
-- 仿真分页显示，告别瀑布流，还原纸书翻页感
-- 多种翻页方式：点击左右区域 / 键盘方向键 / 移动端左右滑动
-- 三种阅读主题：羊皮纸（默认）/ 护眼绿 / 夜间模式
-- 字号无级调节（14px–24px），偏好本地记忆
-- 自动识别章节标题，生成侧边栏目录并支持跳转
+- 仿真分页显示（每页 800 字），支持键盘 / 点击翻页
+- 三种阅读主题：羊皮纸 / 护眼 / 夜间
+- 字号无级调节，偏好本地记忆
+- 自动识别章节标题，生成侧边栏目录
 
 ### 🤖 AI 伴读「会意」
 - 划选任意文字即可唤起 AI 浮层，进行深度解读与赏析
-- AI 自动关联当前书籍内容与用户书架，提供有温度的个性化回应
-- 独立 AI 书友对话页，随时与"会意"闲聊读书心得
+- AI 自动关联当前书籍内容与用户书架，提供个性化回应
 - 基于阿里云 `qwen-flash-character` 模型驱动
 
-### 📝 阅读笔记
-- 支持划线高亮与私人批注
-- 心得笔记管理，随时回顾阅读感悟
-
-### 👤 个人中心与书友社群
-- 5 款手绘风格头像（猫 / 狗 / 书 / 花 / 鸟）
-- 个人数据统计：书龄、阅读量、已读 / 在读数量
-- 关注 / 粉丝系统，书友匹配推荐
-- 预设经典文学兴趣小组（红楼梦、西游记等）一键加入
+### 👤 用户系统
+- 用户名 + 密码注册登录
+- 个人资料：5 款手绘风格头像 + 个性签名
 
 ---
 
 ## 🏗️ 技术架构
 
+本项目经历了一次完整的技术栈升级，从原型阶段的零依赖实现演进为生产级全栈架构。
+
+### 原始架构（原型阶段）
+
 ```
-Frontend (纯 HTML + Tailwind CSS + 原生 JS)
-       │
-       │ REST JSON API (HTTP)
+原生 HTML + Tailwind CSS + 原生 JS
+       │ REST JSON API
        ▼
-Backend (Python 标准库 http.server)
-  ├── SQLite  ← 用户、书籍、进度持久化
-  └── DashScope API  ← AI 对话 (qwen-flash-character)
+Python 标准库 http.server
+  └── SQLite
+  └── DashScope API（AI 对话）
+```
+
+特点：零框架依赖，快速验证产品想法，单文件部署。
+
+### 当前架构（重构后）
+
+```
+React SPA (Vite + TypeScript + Tailwind + shadcn/ui)
+       │ REST JSON API (OpenAPI)
+       ▼
+FastAPI (Python 3.12)
+  ├── SQLModel / SQLAlchemy（ORM）
+  ├── PostgreSQL（生产数据库）
+  └── DashScope API（AI 对话）
 ```
 
 | 层级 | 技术选型 |
-|---|---|
-| 后端 | Python 标准库（`http.server` + `sqlite3`），零框架依赖 |
-| 前端 | 原生 HTML / JS + Tailwind CSS（本地化部署） |
-| 数据库 | SQLite（单文件，随启随用） |
+|------|---------|
+| 后端框架 | FastAPI + Pydantic v2 + SQLModel |
+| 数据库 | PostgreSQL（生产）/ SQLite in-memory（测试）|
+| 前端框架 | React 18 + TypeScript strict + Vite |
+| UI 组件 | Tailwind CSS + shadcn/ui |
+| 数据获取 | TanStack Query |
+| 代码规范 | Ruff + Mypy（后端）/ Biome（前端）|
+| 测试 | Pytest（后端 39 tests）/ Vitest（前端 94 tests）|
+| 部署 | Render.com（FastAPI 直接托管 React 构建产物）|
 | AI | 阿里云 DashScope `qwen-flash-character` |
-| 部署 | Railway / Render.com（一键部署） |
+
+### 架构改造内容
+
+本次重构涵盖以下主要改动：
+
+1. **后端框架替换**：原生 `http.server` → FastAPI，引入类型安全的路由、Pydantic schema 验证、分层架构（route → service → model）
+2. **前端框架替换**：多页原生 HTML → React SPA，统一路由由 React Router 管理，FastAPI 直接托管 `frontend/dist/`
+3. **前后端集成**：建立 `docs/openapi.json` 机器契约，生成 `frontend/src/api/generated/openapi.ts` 类型，消除手写类型漂移风险
+4. **进度存储打通**：前端计算阅读进度百分比 → `POST /api/update_current_book` → 写入 `Book.progress`，书架进度条实时同步
+5. **测试体系建立**：后端 API 集成测试全覆盖（auth / books / users / chat / SPA serving），前端组件 + hook 单元测试
+6. **代码质量清理**：修复 `datetime.utcnow` 弃用、前后端 ID 类型不一致（`number` → `string`）、冗余 fallback、`GuestRoute` 组件提取、`AiOverlay` exhaustive-deps 修复
 
 ---
 
 ## 🚀 快速开始
 
-### 本地运行
+### 前置要求
 
-**前置要求**：Python 3.8+，无需安装任何第三方包
+- Python 3.12+
+- Node.js 20+，pnpm
+- PostgreSQL（本地开发可用 Docker）
+
+### 本地运行
 
 ```bash
 # 1. 克隆项目
-git clone <repo-url>
+git clone git@github.com:leeing/HuiYi.git
 cd HuiYi
 
-# 2. 配置 AI 密钥（可选，不配置则 AI 功能不可用）
-# 在 .env 或系统环境变量中设置 DASHSCOPE_API_KEY
+# 2. 后端依赖
+cd backend
+uv sync
 
-# 3. 启动服务
-python run_app.py
+# 3. 配置环境变量
+cp .env.example .env
+# 编辑 .env，填写 DATABASE_URL 和 DASHSCOPE_API_KEY
 
-# 4. 打开浏览器访问
-# http://localhost:8000
+# 4. 前端依赖 + 构建
+cd ../frontend
+pnpm install
+pnpm build
+
+# 5. 启动服务
+cd ../backend
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# 访问 http://localhost:8000
+```
+
+### 开发模式（前后端分离）
+
+```bash
+# 终端 1 — 后端
+cd backend && uv run uvicorn app.main:app --reload
+
+# 终端 2 — 前端（Vite dev server，支持 HMR）
+cd frontend && pnpm dev
 ```
 
 ### 测试账号
 
-首次启动会自动创建以下测试用户（密码均为 `123456`）：
+首次启动自动创建以下测试用户（密码均为 `123456`）：
 
 | 用户名 | 个性签名 |
-|---|---|
+|--------|---------|
 | `test_user_1` | 书山有路勤为径 |
 | `book_lover` | 也就是想读点好书 |
 | `poem_soul` | 生活不只是眼前的苟且 |
 
 ---
 
-## ☁️ 云端部署
+## ☁️ 部署
 
 ### Render.com
 
 1. Fork 本仓库
-2. 在 Render 新建 Web Service，连接你的仓库
-3. 配置环境变量 `DASHSCOPE_API_KEY`
-4. 点击部署，`render.yaml` 已预配置好所有参数
+2. 在 Render 新建 Web Service，连接仓库
+3. 配置环境变量：`DASHSCOPE_API_KEY`、`DATABASE_URL`（PostgreSQL）
+4. 点击部署，`render.yaml` 已预配置构建与启动命令
 
-### Railway
-
-1. Fork 本仓库
-2. 在 Railway 导入项目
-3. 配置环境变量 `DASHSCOPE_API_KEY`
-4. 自动读取 `Procfile` 启动
-
----
-
-## 🔌 API 接口
-
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| `POST` | `/api/register` | 用户注册 |
-| `POST` | `/api/login` | 用户登录 |
-| `GET` | `/api/books?user_id=` | 获取书架列表 |
-| `GET` | `/api/book_content?book_id=` | 获取书籍全文 |
-| `GET` | `/api/current_book?user_id=` | 获取当前阅读书目 |
-| `GET` | `/api/user_profile?user_id=` | 获取用户信息 |
-| `POST` | `/api/upload` | 上传书籍（Base64 TXT） |
-| `POST` | `/api/chat` | AI 对话 |
-| `POST` | `/api/update_current_book` | 更新当前阅读书籍 |
+构建命令会自动完成：安装 Python 依赖 → 安装 pnpm → 前端构建 → FastAPI 托管产物。
 
 ---
 
@@ -131,51 +158,63 @@ python run_app.py
 
 ```
 HuiYi/
-├── run_app.py          # 后端服务（HTTP Server + API + DB）
-├── login.html          # 登录 / 注册页
-├── bookshelf.html      # 书架主页
-├── reader.html         # 沉浸式阅读器
-├── chat.html           # AI 书友对话
-├── notes.html          # 阅读笔记
-├── profile.html        # 个人中心
-├── static/
-│   ├── books/          # 书籍 TXT 文件
-│   ├── avatars/        # SVG 手绘头像
-│   └── tailwind.js     # Tailwind CSS（本地化）
-├── Procfile            # Railway 部署配置
-├── render.yaml         # Render 部署配置
-├── requirements.txt    # 依赖（几乎为空）
-└── PRD.md              # 产品需求文档
+├── backend/
+│   ├── app/
+│   │   ├── main.py              # FastAPI 应用，托管 React SPA
+│   │   ├── api/routes/          # 路由层（auth / books / users / chat）
+│   │   ├── services/            # 业务逻辑层
+│   │   ├── models/              # SQLModel 数据模型
+│   │   ├── schemas/             # Pydantic DTO
+│   │   └── core/                # 配置、日志、安全
+│   └── tests/                   # Pytest 集成测试
+├── frontend/
+│   ├── src/
+│   │   ├── app/                 # Router、AuthContext、GuestRoute、ProtectedRoute
+│   │   ├── api/                 # TanStack Query hooks、类型定义、生成的 OpenAPI 类型
+│   │   └── features/            # 页面组件（auth / bookshelf / reader）
+│   └── dist/                    # Vite 构建产物（由 FastAPI 托管）
+├── docs/
+│   ├── openapi.json             # FastAPI 自动导出的 OpenAPI 契约
+│   └── API.md                   # AI 友好的 API 摘要
+├── static/                      # 书籍 TXT 文件、SVG 头像
+└── render.yaml                  # Render 部署配置
 ```
 
 ---
 
-## 🎨 设计规范
+## 🗺️ 后续计划
 
-| 设计要素 | 说明 |
-|---|---|
-| 主色调 | 宣纸色 `#F9F5F0` + 墨色 `#2C2C2C` + 暖红 `#A64D4D` |
-| 字体 | 思源宋体 Noto Serif SC（主）+ 朱孟星手写体（装饰） |
-| 质感 | 全站纸张纹理背景 + 卡片毛玻璃效果 |
-| 适配 | 手机优先，最大宽度 430px，完美适配 iOS / Android |
+### 第一优先级：安全基础
+
+- **JWT 认证**：当前 `user_id` 明文传递于请求体，无法抵御伪造请求。引入 JWT 后端签发 / 验证，所有 API 改为从 token 解析用户身份，彻底隔离用户数据
+
+### 第二优先级：手机号登录
+
+- 接入阿里云 SMS（或腾讯云）发送验证码，个人实名即可开通，无需企业资质
+- 与 JWT 改造合并实施，User 模型加 `phone` 字段，支持「手机号 + 验证码」与「用户名 + 密码」双入口
+
+### 第三优先级：内容留存
+
+- **划线 / 笔记**：选文后除 AI 解读外，可保存为私人笔记，用户在书里留下自己的痕迹
+- **读书日历**：用日历视图展示每天的阅读记录，比进度百分比更有温度
+
+### 第四优先级：AI 主动陪伴
+
+- **书友模式**：AI 在用户翻页时偶尔主动冒泡，频率由用户控制，让「懂书也懂你」真正被感知
+
+### 第五优先级：内容发现
+
+- **公共书库**：精选公版古籍（无版权问题），用户一键加入书架，解决冷启动问题
+- **个人页面编辑**：支持修改头像、签名、用户名
 
 ---
 
 ## ⚠️ 已知限制
 
-- 目前仅支持 **TXT 格式**书籍导入，暂不支持 EPUB
-- 目录识别基于规则匹配，复杂格式可能不准确
-- AI 功能依赖阿里云 DashScope 免费额度，有调用次数上限
-- 登录态基于 `localStorage` 存储，无 Token 过期机制
-- SQLite 不适用于高并发场景，适合个人 / 小团队使用
-
----
-
-## 🗺️ 未来规划
-
-- **v1.1**：EPUB 引擎升级，支持插图与复杂排版；笔记导出为 Markdown/PDF
-- **v1.2**：真实社区化，书评广场，共读挑战活动
-- **v1.3**：AI 角色定制，支持自定义伴读人格（毒舌评论家 / 温柔知己）
+- 仅支持 TXT 格式书籍，暂不支持 EPUB
+- 目录识别基于规则匹配，复杂格式可能不准
+- 认证机制尚未引入 JWT，`user_id` 明文传递（待第一优先级改造）
+- 测试环境使用 SQLite in-memory，生产需配置 PostgreSQL
 
 ---
 

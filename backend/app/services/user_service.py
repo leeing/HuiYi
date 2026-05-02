@@ -61,6 +61,12 @@ def update_current_book(
         if book and book.user_id == req.user_id:
             book.progress = max(0, min(100, req.progress))
             session.add(book)
+        elif book:
+            logger.warning(
+                "Progress update skipped: book_id=%s does not belong to user_id=%s",
+                req.book_id,
+                req.user_id,
+            )
 
     session.commit()
     logger.info(

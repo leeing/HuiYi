@@ -38,7 +38,5 @@ export const handlers = [
   http.post("/api/chat", () =>
     Response.json({ response: "这是一个测试 AI 回复。" }),
   ),
-  http.post("/api/update_current_book", () =>
-    Response.json({ success: true }),
-  ),
+  http.post("/api/update_current_book", () => Response.json({ success: true })),
 ];

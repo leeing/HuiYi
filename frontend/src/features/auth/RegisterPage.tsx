@@ -2,7 +2,6 @@ import { ApiError } from "@/api/client";
 import { useRegister } from "@/api/hooks/useAuth";
 import { useAuth } from "@/app/AuthContext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -34,12 +33,6 @@ export default function RegisterPage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const registerMutation = useRegister();
-
-  useEffect(() => {
-    if (auth.status === "authenticated") {
-      void navigate("/", { replace: true });
-    }
-  }, [auth.status, navigate]);
 
   const {
     register,

@@ -1,5 +1,5 @@
 import { useChat } from "@/api/hooks/useChat";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface AiOverlayProps {
   selectedText: string;
@@ -13,14 +13,16 @@ export default function AiOverlay({
   onClose,
 }: AiOverlayProps) {
   const { mutate, data, isPending, isError } = useChat();
+  const firedRef = useRef(false);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: fire once on mount
   useEffect(() => {
+    if (firedRef.current) return;
+    firedRef.current = true;
     mutate({
       message: `请解释这段文字的含义：${selectedText}`,
       book_context: bookContext,
     });
-  }, []);
+  }, [mutate, selectedText, bookContext]);
 
   return (
     <dialog

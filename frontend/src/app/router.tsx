@@ -1,5 +1,6 @@
 import { Suspense, lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
+import { GuestRoute } from "./GuestRoute";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 const LoginPage = lazy(() => import("@/features/auth/LoginPage"));
@@ -17,20 +18,25 @@ function PageFallback() {
 
 export const router = createBrowserRouter([
   {
-    path: "/login",
-    element: (
-      <Suspense fallback={<PageFallback />}>
-        <LoginPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: "/register",
-    element: (
-      <Suspense fallback={<PageFallback />}>
-        <RegisterPage />
-      </Suspense>
-    ),
+    element: <GuestRoute />,
+    children: [
+      {
+        path: "/login",
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/register",
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <RegisterPage />
+          </Suspense>
+        ),
+      },
+    ],
   },
   {
     element: <ProtectedRoute />,

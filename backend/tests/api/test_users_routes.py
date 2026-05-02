@@ -1,0 +1,102 @@
+import base64
+
+from fastapi.testclient import TestClient
+
+
+def _register(client: TestClient, username: str = "testuser") -> str:
+    resp = client.post(
+        "/api/register", json={"username": username, "password": "testpass"}
+    )
+    return resp.json()["user_id"]
+
+
+def _upload_book(client: TestClient, user_id: str, title: str = "测试书") -> str:
+    content = base64.b64encode("书籍内容".encode()).decode()
+    resp = client.post(
+        "/api/upload",
+        json={
+            "user_id": user_id,
+            "filename": f"{title}.txt",
+            "content": content,
+            "author": "作者",
+        },
+    )
+    return resp.json()["book_id"]
+
+
+# --- /api/user_profile ---
+
+def test_user_profile_success(client: TestClient) -> None:
+    user_id = _register(client, "alice")
+    resp = client.get(f"/api/user_profile?user_id={user_id}")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["username"] == "alice"
+    assert "avatar" in data
+    assert "signature" in data
+
+
+def test_user_profile_not_found(client: TestClient) -> None:
+    resp = client.get("/api/user_profile?user_id=nonexistent-id")
+    assert resp.status_code == 404
+
+
+# --- /api/current_book ---
+
+def test_current_book_no_current_set_returns_latest_default(client: TestClient) -> None:
+    # Registration auto-adds default books; with no current_book_id set,
+    # the service returns the most-recently-added book (not None).
+    user_id = _register(client, "bob")
+    resp = client.get(f"/api/current_book?user_id={user_id}")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["book_id"] is not None
+    assert data["title"] is not None
+
+
+def test_current_book_returns_latest_when_no_current_set(client: TestClient) -> None:
+    user_id = _register(client, "carol")
+    book_id = _upload_book(client, user_id, "书籍A")
+    resp = client.get(f"/api/current_book?user_id={user_id}")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["book_id"] == book_id
+    assert data["title"] == "书籍A"
+
+
+def test_current_book_not_found_user(client: TestClient) -> None:
+    resp = client.get("/api/current_book?user_id=nonexistent-id")
+    assert resp.status_code == 404
+
+
+# --- /api/update_current_book ---
+
+def test_update_current_book_success(client: TestClient) -> None:
+    user_id = _register(client, "dave")
+    book_id = _upload_book(client, user_id)
+    resp = client.post(
+        "/api/update_current_book",
+        json={"user_id": user_id, "book_id": book_id},
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"success": True}
+
+
+def test_update_current_book_persists(client: TestClient) -> None:
+    user_id = _register(client, "eve")
+    book_id = _upload_book(client, user_id, "持久化测试书")
+    client.post(
+        "/api/update_current_book",
+        json={"user_id": user_id, "book_id": book_id},
+    )
+    resp = client.get(f"/api/current_book?user_id={user_id}")
+    assert resp.status_code == 200
+    assert resp.json()["book_id"] == book_id
+
+
+def test_update_current_book_user_not_found(client: TestClient) -> None:
+    resp = client.post(
+        "/api/update_current_book",
+        json={"user_id": "nonexistent-id", "book_id": "some-book-id"},
+    )
+    assert resp.status_code == 404

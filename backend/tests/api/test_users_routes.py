@@ -93,3 +93,21 @@ def test_update_current_book_user_not_found(client: TestClient) -> None:
         json={"user_id": "nonexistent-id", "book_id": "some-book-id"},
     )
     assert resp.status_code == 404
+
+
+def test_update_current_book_with_progress(client: TestClient) -> None:
+    user_id = _register(client, "frank")
+    book_id = _upload_book(client, user_id, "进度书")
+    resp = client.post(
+        "/api/update_current_book",
+        json={"user_id": user_id, "book_id": book_id, "progress": 42},
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"success": True}
+    # 验证进度写入：通过 /api/books 查询 progress 字段
+    books_resp = client.get(f"/api/books?user_id={user_id}")
+    assert books_resp.status_code == 200
+    books = books_resp.json()["books"]
+    target = next((b for b in books if b["id"] == book_id), None)
+    assert target is not None
+    assert target["progress"] == 42

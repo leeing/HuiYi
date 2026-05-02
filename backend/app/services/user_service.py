@@ -55,6 +55,18 @@ def update_current_book(
         raise LookupError(f"User not found: {req.user_id}")
     user.current_book_id = req.book_id
     session.add(user)
+
+    if req.progress is not None:
+        book = session.get(Book, req.book_id)
+        if book and book.user_id == req.user_id:
+            book.progress = max(0, min(100, req.progress))
+            session.add(book)
+
     session.commit()
-    logger.info("Updated current book user_id=%s book_id=%s", req.user_id, req.book_id)
+    logger.info(
+        "Updated current book user_id=%s book_id=%s progress=%s",
+        req.user_id,
+        req.book_id,
+        req.progress,
+    )
     return {"success": True}

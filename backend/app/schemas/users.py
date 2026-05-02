@@ -10,6 +10,7 @@ class UserProfileResponse(BaseModel):
 class UpdateCurrentBookRequest(BaseModel):
     user_id: str
     book_id: str
+    progress: int | None = None
 
 
 class CurrentBookResponse(BaseModel):

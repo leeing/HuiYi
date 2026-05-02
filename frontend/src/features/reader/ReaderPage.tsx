@@ -43,17 +43,13 @@ export default function ReaderPage() {
   const { prefs, setPrefs } = useReaderPrefs();
   const content = data?.content ?? "";
 
-  // Fires on every page turn to keep the backend aware of the current book being read.
-  // The payload is intentionally minimal (user_id + book_id); progress percentage is
-  // computed locally but the API does not yet accept it.
+  // Fires on every page turn: marks current book and persists reading progress.
   useEffect(() => {
     if (!bookIdNum || !userId || !content) return;
     const totalPages = paginate(content, CHARS_PER_PAGE).length;
     const progress =
       totalPages > 1 ? Math.round((currentPage / (totalPages - 1)) * 100) : 100;
-    updateCurrentBook({ user_id: userId, book_id: bookIdNum });
-    // progress is computed but API doesn't accept it yet
-    void progress;
+    updateCurrentBook({ user_id: userId, book_id: bookIdNum, progress });
   }, [currentPage, bookIdNum, userId, content, updateCurrentBook]);
 
   const handleSelectionChange = useCallback(

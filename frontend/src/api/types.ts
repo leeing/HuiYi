@@ -61,6 +61,7 @@ export interface CurrentBookResponse {
 export interface UpdateCurrentBookRequest {
   user_id: number;
   book_id: number;
+  progress?: number;
 }
 
 export interface UpdateCurrentBookResponse {

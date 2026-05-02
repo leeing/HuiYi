@@ -26,6 +26,7 @@ def _upload_book(client: TestClient, user_id: str, title: str = "测试书") -> 
 
 # --- /api/user_profile ---
 
+
 def test_user_profile_success(client: TestClient) -> None:
     user_id = _register(client, "alice")
     resp = client.get(f"/api/user_profile?user_id={user_id}")
@@ -43,6 +44,7 @@ def test_user_profile_not_found(client: TestClient) -> None:
 
 # --- /api/current_book ---
 
+
 def test_current_book_returns_latest_when_no_current_set(client: TestClient) -> None:
     user_id = _register(client, "carol")
     book_id = _upload_book(client, user_id, "书籍A")
@@ -59,6 +61,7 @@ def test_current_book_not_found_user(client: TestClient) -> None:
 
 
 # --- /api/update_current_book ---
+
 
 def test_update_current_book_success(client: TestClient) -> None:
     user_id = _register(client, "dave")

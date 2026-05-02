@@ -5,12 +5,16 @@ services:
     buildCommand: >-
       pip install uv &&
       uv sync --project backend &&
-      cd frontend && npm install -g pnpm && pnpm install && pnpm build && cd ..
+      cd frontend &&
+      corepack enable &&
+      corepack prepare pnpm@latest --activate &&
+      pnpm install &&
+      pnpm build
     startCommand: cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DASHSCOPE_API_KEY
         sync: false
       - key: PYTHON_VERSION
-        value: "3.11.0"
+        value: "3.12"
       - key: NODE_VERSION
         value: "20"

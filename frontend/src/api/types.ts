@@ -12,13 +12,13 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   message: string;
-  user_id: number;
+  user_id: string;
   avatar: string;
   signature: string;
 }
 
 export interface Book {
-  id: number;
+  id: string;
   title: string;
   author: string;
   progress: number;
@@ -35,7 +35,7 @@ export interface BookContentResponse {
 }
 
 export interface UploadRequest {
-  user_id: number;
+  user_id: string;
   filename: string;
   content: string; // base64
   author?: string;
@@ -43,7 +43,7 @@ export interface UploadRequest {
 
 export interface UploadResponse {
   message: string;
-  book_id: number;
+  book_id: string;
 }
 
 export interface UserProfile {
@@ -53,14 +53,14 @@ export interface UserProfile {
 }
 
 export interface CurrentBookResponse {
-  book_id: number | null;
+  book_id: string | null;
   title?: string;
   author?: string;
 }
 
 export interface UpdateCurrentBookRequest {
-  user_id: number;
-  book_id: number;
+  user_id: string;
+  book_id: string;
   progress?: number;
 }
 
@@ -70,7 +70,7 @@ export interface UpdateCurrentBookResponse {
 
 export interface ChatRequest {
   message: string;
-  user_id?: number;
+  user_id?: string;
   book_context?: string;
 }
 

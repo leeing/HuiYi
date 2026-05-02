@@ -21,16 +21,19 @@ describe("useBooks", () => {
   });
 
   it("fetches books for a user", async () => {
-    const { result } = renderHook(() => useBooks(1), {
-      wrapper: makeWrapper(),
-    });
+    const { result } = renderHook(
+      () => useBooks("00000000-0000-0000-0000-000000000001"),
+      {
+        wrapper: makeWrapper(),
+      },
+    );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.books).toHaveLength(1);
     expect(result.current.data?.books[0]?.title).toBe("测试书籍");
   });
 
-  it("does not fetch when userId is 0", () => {
-    const { result } = renderHook(() => useBooks(0), {
+  it("does not fetch when userId is empty", () => {
+    const { result } = renderHook(() => useBooks(""), {
       wrapper: makeWrapper(),
     });
     expect(result.current.fetchStatus).toBe("idle");
@@ -44,11 +47,16 @@ describe("useUploadBook", () => {
   });
 
   it("uploads a book and returns book_id", async () => {
-    const { result } = renderHook(() => useUploadBook(1), {
-      wrapper: makeWrapper(),
-    });
+    const { result } = renderHook(
+      () => useUploadBook("00000000-0000-0000-0000-000000000001"),
+      {
+        wrapper: makeWrapper(),
+      },
+    );
     result.current.mutate({ filename: "test.txt", content: "aGVsbG8=" });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.book_id).toBe(1);
+    expect(result.current.data?.book_id).toBe(
+      "00000000-0000-0000-0000-000000000001",
+    );
   });
 });

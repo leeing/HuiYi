@@ -4,7 +4,7 @@ export const handlers = [
   http.post("/api/login", () =>
     Response.json({
       message: "ok",
-      user_id: 1,
+      user_id: "00000000-0000-0000-0000-000000000001",
       avatar: "",
       signature: "",
     }),
@@ -12,17 +12,29 @@ export const handlers = [
   http.post("/api/register", () =>
     Response.json({
       message: "ok",
-      user_id: 1,
+      user_id: "00000000-0000-0000-0000-000000000001",
       avatar: "",
       signature: "",
     }),
   ),
   http.get("/api/books", () =>
     Response.json({
-      books: [{ id: 1, title: "测试书籍", author: "测试作者", progress: 0 }],
+      books: [
+        {
+          id: "00000000-0000-0000-0000-000000000001",
+          title: "测试书籍",
+          author: "测试作者",
+          progress: 0,
+        },
+      ],
     }),
   ),
-  http.post("/api/upload", () => Response.json({ message: "ok", book_id: 1 })),
+  http.post("/api/upload", () =>
+    Response.json({
+      message: "ok",
+      book_id: "00000000-0000-0000-0000-000000000001",
+    }),
+  ),
   http.get("/api/user_profile", () =>
     Response.json({ username: "test", avatar: "", signature: "" }),
   ),

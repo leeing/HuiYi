@@ -15,7 +15,10 @@ function renderModal(onClose = vi.fn()) {
   const queryClient = new QueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
-      <UploadModal userId={1} onClose={onClose} />
+      <UploadModal
+        userId="00000000-0000-0000-0000-000000000001"
+        onClose={onClose}
+      />
     </QueryClientProvider>,
   );
 }

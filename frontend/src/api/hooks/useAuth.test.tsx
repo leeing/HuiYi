@@ -24,7 +24,9 @@ describe("useLogin", () => {
     const { result } = renderHook(() => useLogin(), { wrapper: makeWrapper() });
     result.current.mutate({ username: "alice", password: "secret" });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.user_id).toBe(1);
+    expect(result.current.data?.user_id).toBe(
+      "00000000-0000-0000-0000-000000000001",
+    );
     expect(result.current.data?.message).toBe("ok");
   });
 });
@@ -40,7 +42,9 @@ describe("useRegister", () => {
     });
     result.current.mutate({ username: "bob", password: "secret123" });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.user_id).toBe(1);
+    expect(result.current.data?.user_id).toBe(
+      "00000000-0000-0000-0000-000000000001",
+    );
     expect(result.current.data?.message).toBe("ok");
   });
 });

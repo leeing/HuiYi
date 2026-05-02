@@ -2,17 +2,17 @@ import { apiClient } from "@/api/client";
 import type { BooksResponse, UploadRequest, UploadResponse } from "@/api/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const BOOKS_QUERY_KEY = (userId: number) => ["books", userId] as const;
+export const BOOKS_QUERY_KEY = (userId: string) => ["books", userId] as const;
 
-export function useBooks(userId: number) {
+export function useBooks(userId: string) {
   return useQuery({
     queryKey: BOOKS_QUERY_KEY(userId),
     queryFn: () => apiClient<BooksResponse>(`/books?user_id=${userId}`),
-    enabled: userId > 0,
+    enabled: userId.length > 0,
   });
 }
 
-export function useUploadBook(userId: number) {
+export function useUploadBook(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: Omit<UploadRequest, "user_id">) =>

@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useRef, useState } from "react";
 
 interface UploadModalProps {
-  userId: number;
+  userId: string;
   onClose: () => void;
 }
 

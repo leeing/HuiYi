@@ -17,16 +17,19 @@ function makeWrapper() {
 
 describe("useBookContent", () => {
   it("fetches book content for a given bookId", async () => {
-    const { result } = renderHook(() => useBookContent(1), {
-      wrapper: makeWrapper(),
-    });
+    const { result } = renderHook(
+      () => useBookContent("00000000-0000-0000-0000-000000000001"),
+      {
+        wrapper: makeWrapper(),
+      },
+    );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.title).toBe("测试书籍");
     expect(result.current.data?.content).toContain("第一章");
   });
 
-  it("does not fetch when bookId is 0", () => {
-    const { result } = renderHook(() => useBookContent(0), {
+  it("does not fetch when bookId is empty", () => {
+    const { result } = renderHook(() => useBookContent(""), {
       wrapper: makeWrapper(),
     });
     expect(result.current.fetchStatus).toBe("idle");
@@ -39,7 +42,10 @@ describe("useUpdateCurrentBook", () => {
     const { result } = renderHook(() => useUpdateCurrentBook(), {
       wrapper: makeWrapper(),
     });
-    result.current.mutate({ user_id: 1, book_id: 1 });
+    result.current.mutate({
+      user_id: "00000000-0000-0000-0000-000000000001",
+      book_id: "00000000-0000-0000-0000-000000000001",
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
   });
 });

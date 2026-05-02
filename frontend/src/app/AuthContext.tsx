@@ -13,7 +13,7 @@ type AuthState =
   | { status: "anonymous" }
   | {
       status: "authenticated";
-      userId: number;
+      userId: string;
       username: string;
       avatar: string;
       signature: string;
@@ -21,7 +21,7 @@ type AuthState =
 
 type AuthContextValue = AuthState & {
   login: (
-    userId: number,
+    userId: string,
     username: string,
     avatar: string,
     signature: string,
@@ -34,7 +34,7 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 const STORAGE_KEY = "huiyi_auth";
 
 const StoredAuthSchema = z.object({
-  userId: z.number().describe("Numeric user ID from the backend"),
+  userId: z.string().describe("UUID user ID from the backend"),
   username: z.string().describe("Display name of the authenticated user"),
   avatar: z.string().describe("URL or path to the user's avatar image"),
   signature: z.string().describe("User's personal signature or bio"),
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(
-    (userId: number, username: string, avatar: string, signature: string) => {
+    (userId: string, username: string, avatar: string, signature: string) => {
       const stored: StoredAuth = { userId, username, avatar, signature };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
       setState({

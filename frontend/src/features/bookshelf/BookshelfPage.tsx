@@ -6,7 +6,7 @@ import UploadModal from "./UploadModal";
 
 export default function BookshelfPage() {
   const auth = useAuth();
-  const userId = auth.status === "authenticated" ? auth.userId : 0;
+  const userId = auth.status === "authenticated" ? auth.userId : "";
   const username = auth.status === "authenticated" ? auth.username : "";
   const logout = auth.logout;
 

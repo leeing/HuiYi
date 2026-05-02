@@ -18,7 +18,7 @@ describe("ProtectedRoute", () => {
   it("renders children when authenticated", () => {
     vi.mocked(useAuth).mockReturnValue({
       status: "authenticated",
-      userId: 1,
+      userId: "00000000-0000-0000-0000-000000000001",
       username: "test",
       avatar: "",
       signature: "",

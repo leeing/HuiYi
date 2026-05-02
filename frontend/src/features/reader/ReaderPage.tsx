@@ -27,13 +27,12 @@ interface SelectionState {
 
 export default function ReaderPage() {
   const { bookId } = useParams<{ bookId: string }>();
-  const rawId = Number(bookId ?? "0");
-  const bookIdNum = Number.isNaN(rawId) ? 0 : rawId;
+  const bookIdStr = bookId ?? "";
 
   const authCtx = useContext(AuthContext);
-  const userId = authCtx?.status === "authenticated" ? authCtx.userId : 0;
+  const userId = authCtx?.status === "authenticated" ? authCtx.userId : "";
 
-  const { data, isLoading, isError } = useBookContent(bookIdNum);
+  const { data, isLoading, isError } = useBookContent(bookIdStr);
   const { mutate: updateCurrentBook } = useUpdateCurrentBook();
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -45,12 +44,12 @@ export default function ReaderPage() {
 
   // Fires on every page turn: marks current book and persists reading progress.
   useEffect(() => {
-    if (!bookIdNum || !userId || !content) return;
+    if (!bookIdStr || !userId || !content) return;
     const totalPages = paginate(content, CHARS_PER_PAGE).length;
     const progress =
       totalPages > 1 ? Math.round((currentPage / (totalPages - 1)) * 100) : 100;
-    updateCurrentBook({ user_id: userId, book_id: bookIdNum, progress });
-  }, [currentPage, bookIdNum, userId, content, updateCurrentBook]);
+    updateCurrentBook({ user_id: userId, book_id: bookIdStr, progress });
+  }, [currentPage, bookIdStr, userId, content, updateCurrentBook]);
 
   const handleSelectionChange = useCallback(
     (text: string, x: number, y: number) => {

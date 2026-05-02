@@ -18,7 +18,7 @@ describe("AuthContext", () => {
     localStorage.setItem(
       "huiyi_auth",
       JSON.stringify({
-        userId: 42,
+        userId: "00000000-0000-0000-0000-000000000042",
         username: "alice",
         avatar: "",
         signature: "",
@@ -27,7 +27,9 @@ describe("AuthContext", () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
     expect(result.current.status).toBe("authenticated");
     if (result.current.status === "authenticated") {
-      expect(result.current.userId).toBe(42);
+      expect(result.current.userId).toBe(
+        "00000000-0000-0000-0000-000000000042",
+      );
       expect(result.current.username).toBe("alice");
     }
   });
@@ -37,7 +39,12 @@ describe("AuthContext", () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
     expect(result.current.status).toBe("anonymous");
     act(() => {
-      result.current.login(1, "bob", "", "");
+      result.current.login(
+        "00000000-0000-0000-0000-000000000001",
+        "bob",
+        "",
+        "",
+      );
     });
     expect(result.current.status).toBe("authenticated");
   });
@@ -45,7 +52,12 @@ describe("AuthContext", () => {
   it("logout() resets state to anonymous and clears localStorage", () => {
     localStorage.setItem(
       "huiyi_auth",
-      JSON.stringify({ userId: 1, username: "bob", avatar: "", signature: "" }),
+      JSON.stringify({
+        userId: "00000000-0000-0000-0000-000000000001",
+        username: "bob",
+        avatar: "",
+        signature: "",
+      }),
     );
     const { result } = renderHook(() => useAuth(), {
       wrapper: ({ children }: { children: React.ReactNode }) => (

@@ -6,15 +6,15 @@ import type {
 } from "@/api/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const BOOK_CONTENT_QUERY_KEY = (bookId: number) =>
+export const BOOK_CONTENT_QUERY_KEY = (bookId: string) =>
   ["book_content", bookId] as const;
 
-export function useBookContent(bookId: number) {
+export function useBookContent(bookId: string) {
   return useQuery({
     queryKey: BOOK_CONTENT_QUERY_KEY(bookId),
     queryFn: () =>
       apiClient<BookContentResponse>(`/book_content?book_id=${bookId}`),
-    enabled: bookId > 0,
+    enabled: bookId.length > 0,
   });
 }
 

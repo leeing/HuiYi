@@ -3,7 +3,12 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import BookCard from "./BookCard";
 
-const book = { id: 1, title: "红楼梦", author: "曹雪芹", progress: 42 };
+const book = {
+  id: "00000000-0000-0000-0000-000000000001",
+  title: "红楼梦",
+  author: "曹雪芹",
+  progress: 42,
+};
 
 describe("BookCard", () => {
   it("renders book title and author", () => {
@@ -32,6 +37,9 @@ describe("BookCard", () => {
       </MemoryRouter>,
     );
     const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", "/reader/1");
+    expect(link).toHaveAttribute(
+      "href",
+      "/reader/00000000-0000-0000-0000-000000000001",
+    );
   });
 });

@@ -14,7 +14,7 @@ def test_spa_fallback_returns_html_when_dist_exists(client: TestClient) -> None:
     resp = client.get("/reader/123")
     if resp.status_code == 200:
         assert "text/html" in resp.headers.get("content-type", "")
-    elif resp.status_code in (500, 503):
+    elif resp.status_code == 503:
         pass  # dist not built — graceful degradation
     else:
         raise AssertionError(f"Unexpected status code: {resp.status_code}")

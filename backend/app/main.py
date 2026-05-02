@@ -70,7 +70,7 @@ if _assets_dir.exists():
 @app.get("/{full_path:path}", response_class=HTMLResponse)
 def spa_fallback(full_path: str) -> FileResponse:
     """Return index.html for all non-API paths (React Router handles routing)."""
-    if full_path.startswith("api/"):
+    if full_path == "api" or full_path.startswith("api/"):
         raise HTTPException(status_code=404, detail="Not found")
     index = FRONTEND_DIST / "index.html"
     if index.exists():

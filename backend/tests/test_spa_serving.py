@@ -1,4 +1,5 @@
 """Tests for SPA static file serving — route registration order."""
+
 from fastapi.testclient import TestClient
 
 

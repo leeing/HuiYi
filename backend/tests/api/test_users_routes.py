@@ -43,17 +43,6 @@ def test_user_profile_not_found(client: TestClient) -> None:
 
 # --- /api/current_book ---
 
-def test_current_book_no_current_set_returns_latest_default(client: TestClient) -> None:
-    # Registration auto-adds default books; with no current_book_id set,
-    # the service returns the most-recently-added book (not None).
-    user_id = _register(client, "bob")
-    resp = client.get(f"/api/current_book?user_id={user_id}")
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["book_id"] is not None
-    assert data["title"] is not None
-
-
 def test_current_book_returns_latest_when_no_current_set(client: TestClient) -> None:
     user_id = _register(client, "carol")
     book_id = _upload_book(client, user_id, "书籍A")
@@ -85,10 +74,11 @@ def test_update_current_book_success(client: TestClient) -> None:
 def test_update_current_book_persists(client: TestClient) -> None:
     user_id = _register(client, "eve")
     book_id = _upload_book(client, user_id, "持久化测试书")
-    client.post(
+    update_resp = client.post(
         "/api/update_current_book",
         json={"user_id": user_id, "book_id": book_id},
     )
+    assert update_resp.status_code == 200
     resp = client.get(f"/api/current_book?user_id={user_id}")
     assert resp.status_code == 200
     assert resp.json()["book_id"] == book_id

@@ -31,6 +31,15 @@ vi.mock("@/api/hooks/useBooks", () => ({
     mutateAsync: vi.fn(),
     isPending: false,
   }),
+  useUpdateBook: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+  useDeleteBook: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+  useDownloadBook: () => vi.fn(),
 }));
 
 import BookshelfPage from "./BookshelfPage";

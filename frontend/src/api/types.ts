@@ -22,6 +22,8 @@ export interface Book {
   title: string;
   author: string;
   progress: number;
+  file_type?: string;
+  file_size?: number;
 }
 
 export interface BooksResponse {
@@ -32,6 +34,7 @@ export interface BookContentResponse {
   title: string;
   author: string;
   content: string;
+  file_type?: string;
 }
 
 export interface UploadRequest {
@@ -76,4 +79,18 @@ export interface ChatRequest {
 
 export interface ChatResponse {
   response: string;
+}
+
+export interface BookMetadataResponse {
+  book_id: string;
+  title: string;
+  author: string;
+  file_type: string;
+  file_size: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface BookUpdateRequest {
+  title?: string;
+  author?: string;
 }

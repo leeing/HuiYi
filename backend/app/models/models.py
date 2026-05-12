@@ -29,3 +29,7 @@ class Book(SQLModel, table=True):
     filepath: str
     progress: int = Field(default=0)
     added_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    file_type: str = Field(default="txt")
+    file_size: int = Field(default=0)
+    metadata_json: str | None = Field(default=None)
+    content_cached: str | None = Field(default=None)

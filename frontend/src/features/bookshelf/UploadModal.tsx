@@ -9,7 +9,7 @@ interface UploadModalProps {
 }
 
 const MAX_SIZE_MB = 10;
-const ACCEPTED_EXTS = [".txt", ".epub"];
+const ACCEPTED_EXTS = [".txt", ".pdf", ".epub", ".mobi"];
 
 export default function UploadModal({ userId, onClose }: UploadModalProps) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -25,7 +25,7 @@ export default function UploadModal({ userId, onClose }: UploadModalProps) {
     }
     const ext = `.${file.name.split(".").pop() ?? ""}`;
     if (!ACCEPTED_EXTS.includes(ext.toLowerCase())) {
-      setError("仅支持 .txt 或 .epub 文件");
+      setError("仅支持 .txt、.pdf、.epub 或 .mobi 文件");
       return;
     }
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
@@ -81,13 +81,13 @@ export default function UploadModal({ userId, onClose }: UploadModalProps) {
             >
               选择文件{" "}
               <span className="text-ink-dark/40">
-                （.txt 或 .epub，最大10MB）
+                （.txt、.pdf、.epub 或 .mobi，最大10MB）
               </span>
             </label>
             <input
               id="book-file"
               type="file"
-              accept=".txt,.epub"
+              accept=".txt,.pdf,.epub,.mobi"
               ref={fileRef}
               className="mt-1 block w-full text-sm text-ink-dark/70 file:mr-3 file:rounded-lg file:border-0 file:bg-xuan-paper file:px-3 file:py-1.5 file:text-sm file:text-ink-dark"
             />
